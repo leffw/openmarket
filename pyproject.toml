@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "openmarket"
+version = "0.1.0"
+description = ""
+authors = []
+
+[tool.poetry.dependencies]
+python = "^3.7"
+websocket-client = "^1.5.1"
+pydantic = "^1.10.5"
+secp256k1 = "^0.14.0"
+cryptography = "^39.0.2"
+cffi = "^1.15.1"
+mnemonic = "^0.20"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+openmarket = "openmarket.main:main"
