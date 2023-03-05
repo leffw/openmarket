@@ -12,6 +12,7 @@ secp256k1 = "^0.14.0"
 cryptography = "^39.0.2"
 cffi = "^1.15.1"
 mnemonic = "^0.20"
+bip32 = "^3.4"
 
 [tool.poetry.dev-dependencies]
 

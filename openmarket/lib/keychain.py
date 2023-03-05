@@ -2,7 +2,7 @@ from openmarket.lib import bech32
 from secp256k1 import PrivateKey
 from secrets import token_bytes
 from mnemonic import Mnemonic
-from hashlib import sha256
+from bip32 import BIP32
 
 mnemonic = Mnemonic("english")
 
@@ -18,7 +18,7 @@ class KeyChain:
     
     @staticmethod
     def to_nsec(seed: bytes) -> str:
-        nsec = bech32.convertbits(sha256(seed).digest(), 8, 5)
+        nsec = bech32.convertbits(BIP32.from_seed(seed).get_privkey_from_path(r"m/44'/1237'/0'/0/0"), 8, 5)
         return bech32.bech32_encode("nsec", nsec, bech32.Encoding.BECH32)
 
     @staticmethod
