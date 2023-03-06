@@ -6,10 +6,12 @@ import logging
 relay = relay.Relay(NOSTR_RELAY)
 
 def subscribe(filters: list, callback: object = None):
-    relay.send(filters)
+    relay.send(filters, no_recv=True)
     
     while True:
         data = relay.recv()
+        logging.info(str(data))
+        
         if not isinstance(data, list):
             continue
         
@@ -19,8 +21,7 @@ def subscribe(filters: list, callback: object = None):
         if (data[0] != "EVENT"):
             continue
         
-        logging.info(str(data))
         if (callback):
             callback(data)
-            
+        
     relay.close(id=filters[1])
