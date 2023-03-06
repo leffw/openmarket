@@ -2,18 +2,17 @@
 
 Take your rain with your merciless storm.
 
-## Creating offers
-
 ### Kids
 
 - 123: Creation of the offer.
 - 124: Take offer.
 - 125: Accept offer.
-- 126: Reject offer.
+
+## Creating offers
 
 ### Tags
-- n: Network (e.g "BTC", "LNX").
 - t: Type of order (e.g "SELL").
+- n: Network (e.g "LNX").
 - c: Currency (e.g "BRL").
 - v: Value.
 - p: Price on sell.
@@ -24,13 +23,41 @@ Take your rain with your merciless storm.
 {
     "kid": 123,
     "tags": [
-        ["t": "SELL"],
-        ["n": "BTC"],
-        ["c": "BRL"],
-        ["v": "100000000"],
-        ["p": "22393.63"],
-        ["m": "PIX"],
-        ["x": "94bf31181003df75c87f0914f37edde0095d403b1aeb7e38af91d5b09663ac57"]
+        ["t", "SELL"],
+        ["n", "LNX"],
+        ["c", "BRL"],
+        ["v", "100000000"],
+        ["p", "22393.63"],
+        ["m", "PIX"],
+        ["x", "94bf31181003df75c87f0914f37edde0095d403b1aeb7e38af91d5b09663ac57"]
     ]
+}
+```
+
+## Take offer
+
+### Tags
+
+- i: Make offer id.
+
+```json
+{
+    "kid": 124,
+    "tags": [
+        ["i", "47b142f9c09b1c9dfcbd44f4433e2f3f651d82cf544de78178b93c62b8312499"]
+    ]
+}
+```
+
+## Accept offer
+
+- i: Take offer id
+
+```json
+{
+    "kid": 125,
+    "tags": [
+        ["i", "6d13e15c3dd1f8f6501fced71d7c3e9f82bfc1737f0b0a85a6431b02644f7f49"]
+    ],
 }
 ```

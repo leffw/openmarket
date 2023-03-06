@@ -1,3 +1,4 @@
+from openmarket.lib.nostr.filters import Filters
 from openmarket.lib.nostr.event import Event
 from openmarket.lib.keychain import KeyChain
 
@@ -27,8 +28,6 @@ class OpenDex:
             x = KeyChain.from_npub(x).hex()
         
         npub = KeyChain.to_npub(nsec)
-
-        # Create an offer creation event.  
         event = Event(
             npub,
             kind=123,
@@ -40,6 +39,32 @@ class OpenDex:
                 ["p", str(p)],
                 ["m", m],
                 ["x", x]
+            ]
+        )
+        event.sign(nsec)
+        return event.make()
+
+    @staticmethod
+    def take(nsec: str, i: str) -> list:
+        npub = KeyChain.to_npub(nsec)
+        event = Event(
+            npub,
+            kind=124,
+            tags=[
+                ["i", i]
+            ]
+        )
+        event.sign(nsec)
+        return event.make()
+
+    @staticmethod
+    def accept(nsec: str, i: str) -> list:
+        npub = KeyChain.to_npub(nsec)
+        event = Event(
+            npub,
+            kind=125,
+            tags=[
+                ["i", i]
             ]
         )
         event.sign(nsec)

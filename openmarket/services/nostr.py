@@ -5,7 +5,7 @@ import logging
 
 relay = relay.Relay(NOSTR_RELAY)
 
-def subscribe(filters: list, callback: object = None):
+def subscribe(nsec: str, filters: list, callbacks: list = []):
     relay.send(filters, no_recv=True)
     
     while True:
@@ -21,7 +21,8 @@ def subscribe(filters: list, callback: object = None):
         if (data[0] != "EVENT"):
             continue
         
-        if (callback):
-            callback(data)
-        
+        if (callbacks):
+            for callback in callbacks:
+                callback(nsec, relay, data[-1])
+    
     relay.close(id=filters[1])
