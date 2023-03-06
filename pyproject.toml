@@ -13,6 +13,7 @@ cryptography = "^39.0.2"
 cffi = "^1.15.1"
 mnemonic = "^0.20"
 bip32 = "^3.4"
+python-dotenv = "0.21.0"
 
 [tool.poetry.dev-dependencies]
 

@@ -39,9 +39,9 @@ class Event:
         self.signature = sk.schnorr_sign(
             bytes.fromhex(self.id), None, raw=True).hex()
         return self.signature
-
-    def to_dict(self):
-        return {
+    
+    def make(self):
+        return ["EVENT", {
             "id":         self.id,
             "pubkey":     self.public_key,
             "created_at": self.created_at,
@@ -49,4 +49,4 @@ class Event:
             "tags":       self.tags,
             "content":    self.content,
             "sig":        self.signature
-        }
+        }]

@@ -6,12 +6,18 @@ class Relay:
     def __init__(self, relay: str) -> None:
         self.relay = create_connection(relay)
     
-    def send(self, event_type: int, event: dict) -> dict:
-        if not (event_type in ["EVENT", "REQ", "CLOSE"]):
-            raise ValueError(f"Event: {event_type} is invalid.")
-        
-        self.relay.send(dumps([event_type, event]))        
+    def send(self, event: list) -> dict:
+        self.relay.send(dumps(event))
+
+    def recv(self) -> dict:
         return loads(self.relay.recv())
+        
+    def close(self, id: str = None) -> None:
+        if (id):
+            self.send(dumps(["CLOSE", id]))
+        
+        try:
+            self.relay.close()
+        except:
+            pass
     
-    def close(self):
-        self.relay.close()
