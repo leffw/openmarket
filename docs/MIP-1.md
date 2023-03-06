@@ -1,6 +1,6 @@
 # MIP 1: Stupidly simple `DEX`
 
-Take your rain with your merciless storm.
+This document describes the creation of a communication protocol for a DEX that uses Nostr relays for the transmission and coordination of activities.
 
 ### Kids
 
