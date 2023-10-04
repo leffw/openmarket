@@ -5,16 +5,10 @@ from openmarket.lib.keychain import KeyChain
 class OpenDex:
  
     @staticmethod
-    def create(nsec: str, n: str, t: str, c: str, v: float, p: float, m: str, x: str) -> list:
-        if not (n in ["BTC", "LNX"]):
-            raise ValueError("Network is invalid.")
-        
+    def create(nsec: str, t: str, r: str, v: float, p: float, m: str, x: str) -> list:
         if not (t in ["SELL", "BUY"]):
             raise ValueError("Type is invalid.")
-        
-        if not (c in ["BRL"]):
-            raise ValueError("Currency is invalid.")
-        
+
         if (v <= 0):
             raise ValueError("Value is invalid.")
         
@@ -32,9 +26,8 @@ class OpenDex:
             npub,
             kind=123,
             tags=[
-                ["n", n],
                 ["t", t],
-                ["c", c],
+                ["r", r],
                 ["v", str(v)],
                 ["p", str(p)],
                 ["m", m],
