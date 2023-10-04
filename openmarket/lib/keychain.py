@@ -27,7 +27,7 @@ class KeyChain:
         return bytes(bech32.convertbits(data, 5, 8)[:-1])
     
     @staticmethod
-    def to_npub(nsec: str) -> str:
+    def to_npub(nsec: bytes) -> str:
         npub = bech32.convertbits(PrivateKey(KeyChain.from_nsec(nsec)).pubkey.serialize()[1:], 8, 5)
         return bech32.bech32_encode("npub", npub, bech32.Encoding.BECH32)
 

@@ -12,8 +12,7 @@ This document describes the creation of a communication protocol for a DEX that 
 
 ### Tags
 - t: Type of order (e.g "SELL").
-- n: Network (e.g "LNX").
-- c: Currency (e.g "BRL").
+- r: Pair (e.g "BRL/BTC").
 - v: Value.
 - p: Price on sell.
 - m: Payment method (e.g PIX, TED).
@@ -24,8 +23,7 @@ This document describes the creation of a communication protocol for a DEX that 
     "kid": 123,
     "tags": [
         ["t", "SELL"],
-        ["n", "LNX"],
-        ["c", "BRL"],
+        ["r", "BRL/BTC"],
         ["v", "100000000"],
         ["p", "22393.63"],
         ["m", "PIX"],
