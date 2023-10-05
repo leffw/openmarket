@@ -1,9 +1,13 @@
 from openmarket.services.opendex import OpenDex
+from openmarket.services.nostr import relay
 from openmarket.lib.keychain import KeyChain
 from tabulate import tabulate
 from os.path import exists
+
+from time import time
 from glob import glob
-from os import makedirs
+from os import makedirs, remove, rmdir
+
 import binascii
 import click
 import json
@@ -71,43 +75,103 @@ def join_exchange(npub: str):
 # Command to create a trade order
 @cli.command("trade")
 @click.option("--operation", required=True, type=click.Choice(['BUY', 'SELL']))
+@click.option("--description", default="")
 @click.option("--exchange")
 @click.option("--amount", required=True, type=int)
 @click.option("--pair", required=True)
 @click.option("--price", required=True, type=float)
 @click.option("--payment-method", required=True)
-def create_trade(operation: str, exchange: str, amount: int, pair: str, price: float, payment_method: str):
+def create_trade(
+        operation: str, 
+        description: str,
+        exchange: str, 
+        amount: int, 
+        pair: str, 
+        price: float, 
+        payment_method: str
+    ):
     if not exchange:
         exchange = configs["join"]
 
-    # Create a trade order using OpenDex
-    order = opendex.create(
+    # Create a trade tx using OpenDex
+    expiry_at = int((60 * 60) * 2)
+    tx = opendex.create(
         nsec=configs["nsec"],
+        d=description,
         t=operation,
         r=pair,
         v=amount,
         p=price,
         m=payment_method,
-        x=exchange
+        x=exchange,
+        e=expiry_at
     )
-    order_hex = binascii.hexlify(json.dumps(order).encode("utf-8")).decode()
+    tx_hex = binascii.hexlify(
+        json.dumps(tx).encode("utf-8")).decode()
 
-    txid = order[-1]["id"]
-    makedirs(f"./data/{exchange}", exist_ok=True)
-    with open(f"./data/{exchange}/{txid}.hex", "w") as w:
-        w.write(order_hex) 
+    txid = tx[-1]["id"]
+    path = f"./data/{exchange}/{txid}"
 
-    click.echo(f"Txid: {txid}")
+    makedirs(f"{path}/proposals", exist_ok=True)
+    with open(f"{path}/index.hex", "w") as w:
+        w.write(tx_hex)
 
-# Command to list trade orders
+    click.echo(json.dumps({
+        "txid": txid,
+        "hex": tx_hex,
+        "raw": json.dumps(tx),
+        "relay": json.dumps(relay.send(tx))
+    }, indent=3))
+
+@cli.command("take")
+@click.argument("txid")
+@click.argument("pubk")
+def take_trade(txid: str, pubk: str):
+    tx = opendex.take(configs["nsec"], txid, pubk, configs["join"])
+    tx_hex = binascii.hexlify(json.dumps(tx).encode("utf-8")).decode()
+    with open(f"./data/" + \
+            configs["join"] + \
+                f"/{txid}/proposals/" + \
+                    tx[-1]["id"] + ".hex", "w") as w:
+        w.write(tx_hex)
+
+    click.echo(json.dumps({
+        "txid": txid,
+        "hex": tx_hex,
+        "raw": json.dumps(tx),
+        "relay": json.dumps(relay.send(tx))
+    }, indent=3))
+
+@cli.command("accept")
+@click.argument("order")
+@click.argument("txid")
+@click.argument("pubk")
+def accept_trade(order: str, txid: str, pubk: str):
+    tx = opendex.accept(
+        configs["nsec"],
+        txid,
+        pubk,
+        configs["join"]
+    )
+    tx_hex = binascii.hexlify(json.dumps(tx).encode("utf-8")).decode()
+    with open(f"./data/" + \
+            configs["join"] + \
+                f"/{order}" + "accept.hex", "w") as w:
+        w.write(tx_hex)
+
+    rmdir("./data/" + configs["join"] + f"/{order}/proposals")
+
+    click.echo(json.dumps({
+        "txid": txid,
+        "hex": tx_hex,
+        "raw": json.dumps(tx),
+        "relay": json.dumps(relay.send(tx))
+    }, indent=3))
+
 @cli.command("book")
 def list_trades():
-    exchange = configs["join"]
-    orders = {
-        "BUY": [],
-        "SELL": []
-    }
-    for path in glob(f"./data/{exchange}/*"):
+    txs = { "BUY": [], "SELL": [] }
+    for path in glob(f"./data/" + configs["join"] + "/*/index.hex"):
         with open(path) as tx:
             tx = binascii.unhexlify(tx.read()).decode()
             tx = json.loads(tx)
@@ -115,29 +179,37 @@ def list_trades():
                 continue
             else:
                 tx = tx[-1]
-            
+
+            created_at = tx["created_at"] 
             tags = tx["tags"]
             txid = tx["id"]
             op = None
             tx = dict()
             for tag in tags:
                 k, v = tag
-                if k == "t":
+                if k == "#t":
                     tx["type"] = v
                     op = v
-                elif k == "r":
+                elif k == "#r":
                     tx["pair"] = v
-                elif k == "v":
+                elif k == "#v":
                     tx["value"] = v
-                elif k == "p":
+                elif k == "#p":
                     tx["price"] = v
-                elif k == "m":
+                elif k == "#m":
                     tx["method"] = v
-            
+                elif k == "#e":
+                    tx["expiry_at"] = float(v)
+
+            expiry_at = created_at + tx["expiry_at"]
+            if time() >= expiry_at:
+                remove(path)
+                continue
+
             tx["txid"] = txid
             if op == "BUY":
-                orders["BUY"].append([
-                    txid[:8],
+                txs["BUY"].append([
+                    txid[:16],
                     tx["type"],
                     tx["pair"],
                     tx["value"],
@@ -145,8 +217,8 @@ def list_trades():
                     tx["method"]
                 ])        
             else:
-                orders["SELL"].append([
-                    txid[:8],
+                txs["SELL"].append([
+                    txid[:16],
                     tx["type"],
                     tx["pair"],
                     tx["value"],
@@ -155,7 +227,7 @@ def list_trades():
                 ])    
 
     click.echo(tabulate(
-        orders["BUY"], 
+        txs["BUY"], 
         headers=[
             "Txid", 
             "Type", 
@@ -169,7 +241,7 @@ def list_trades():
     click.echo("\n")
 
     click.echo(tabulate(
-        orders["SELL"], 
+        txs["SELL"], 
         headers=[
             "Txid", 
             "Type", 

@@ -1,3 +1,3 @@
-from os import environ
+from os import getenv
 
-NOSTR_RELAY = environ["NOSTR_RELAY"]
+NOSTR_RELAY = getenv("NOSTR_RELAY", "wss://relay.damus.io/")
