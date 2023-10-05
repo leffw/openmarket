@@ -4,7 +4,7 @@ This document describes the creation of a communication protocol for a DEX that 
 
 ### Kids
 
-- 123: Creation of the offer.
+- 1: Creation of the offer.
 - 124: Take offer.
 - 125: Accept offer.
 
@@ -17,17 +17,19 @@ This document describes the creation of a communication protocol for a DEX that 
 - p: Price on sell.
 - m: Payment method (e.g PIX, TED).
 - x: Exchange public key.
+- e: Expiration
 
 ```json
 {
-    "kid": 123,
+    "kid": 1,
     "tags": [
-        ["t", "SELL"],
-        ["r", "BRL/BTC"],
-        ["v", "100000000"],
-        ["p", "22393.63"],
-        ["m", "PIX"],
-        ["x", "94bf31181003df75c87f0914f37edde0095d403b1aeb7e38af91d5b09663ac57"]
+        ["#t", "SELL"],
+        ["#r", "BRL/BTC"],
+        ["#v", "100000000"],
+        ["#p", "22393.63"],
+        ["#m", "PIX"],
+        ["#e", "3600"],
+        ["#x", "94bf31181003df75c87f0914f37edde0095d403b1aeb7e38af91d5b09663ac57"]
     ]
 }
 ```
