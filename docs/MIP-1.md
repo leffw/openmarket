@@ -1,31 +1,27 @@
-# MIP 1: Stupidly simple `DEX`
+# MIP 1: Stupidly Simple DEX
 
 This document describes the creation of a communication protocol for a DEX that uses Nostr relays for the transmission and coordination of activities.
 
-### Kids
-
-- 1: Creation of the offer.
-- 124: Take offer.
-- 125: Accept offer.
-
-## Creating offers
+## Creating Offers
 
 ### Tags
-- t: Type of order (e.g "SELL").
-- r: Pair (e.g "BRL/BTC").
-- v: Value.
-- p: Price on sell.
-- m: Payment method (e.g PIX, TED).
-- x: Exchange public key.
-- e: Expiration
+- `#i`: Operation Identifier (1 Order Creation)
+- `#t`: Type of order (e.g., "SELL").
+- `#r`: Pair (e.g., "BRL/BTC").
+- `#v`: Value.
+- `#p`: Price on sell.
+- `#m`: Payment method (e.g., PIX, TED).
+- `#x`: Exchange public key.
+- `#e`: Expiration
 
 ```json
 {
     "kid": 1,
     "tags": [
+        ["#i", "1"],
         ["#t", "SELL"],
         ["#r", "BRL/BTC"],
-        ["#v", "100000000"],
+        ["#v", "10"],
         ["#p", "22393.63"],
         ["#m", "PIX"],
         ["#e", "3600"],
@@ -38,26 +34,37 @@ This document describes the creation of a communication protocol for a DEX that 
 
 ### Tags
 
-- i: Make offer id.
+- `#i`: Operation Identifier (2 Order Take)
+- `e`: Offer proposal id.
+- `p`: Offer proposal pubkey.
 
 ```json
 {
-    "kid": 124,
+    "kid": 1,
     "tags": [
-        ["i", "47b142f9c09b1c9dfcbd44f4433e2f3f651d82cf544de78178b93c62b8312499"]
+        ["e", "ed55257f93R0ce0cd99debcd4c7cd88f0c10857f2bf64402541fc3457fff46d1"],
+        ["p", "6a974fa1d6c492794e9e75031dfe66329725b03fa096fb4785686d015930ded2"],
+        ["#i", "2"],
+        ["#x", "94bf31181003df75c87f0914f37edde0095d403b1aeb7e38af91d5b09663ac57"]
     ]
 }
 ```
 
 ## Accept offer
 
-- i: Take offer id
+### Tags
+- `#i`: Operation Identifier (3 Order Accept)
+- `e`: Offer proposal id.
+- `p`: Offer proposal pubkey.
 
 ```json
 {
-    "kid": 125,
+    "kid": 1,
     "tags": [
-        ["i", "6d13e15c3dd1f8f6501fced71d7c3e9f82bfc1737f0b0a85a6431b02644f7f49"]
-    ],
+        ["e", "ed55257f93R0ce0cd99debcd4c7cd88f0c10857f2bf64402541fc3457fff46d1"],
+        ["p", "6a974fa1d6c492794e9e75031dfe66329725b03fa096fb4785686d015930ded2"],
+        ["#i", "3"],
+        ["#x", "94bf31181003df75c87f0914f37edde0095d403b1aeb7e38af91d5b09663ac57"]
+    ]
 }
 ```
