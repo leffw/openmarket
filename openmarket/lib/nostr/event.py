@@ -11,7 +11,7 @@ class EventKID:
 
 class Event:
     
-    def __init__(self, npub_or_pubkey: str, content: str = "", kind: int = EventKID.TEXT_NOTE, tags: list = [], created_at: int = int(time())):
+    def __init__(self, npub_or_pubkey: str, content: str = "", kind: list = [EventKID.TEXT_NOTE], tags: list = [], created_at: int = int(time())):
         if (npub_or_pubkey.startswith("npub") == True):
             npub_or_pubkey = KeyChain.from_npub(npub_or_pubkey).hex()
         
@@ -19,8 +19,8 @@ class Event:
         self.created_at = created_at
         self.signature = None
         self.content = content
-        self.tags = tags
         self.kind = kind
+        self.tags = tags
         self.id = Event.compute_id(
             public_key=self.public_key,
             content=self.content,
@@ -30,7 +30,7 @@ class Event:
         )
 
     @staticmethod
-    def serialize(public_key: str, content: str, kind: int, tags: list, created_at: int) -> str:        
+    def serialize(public_key: str, content: str, kind: list, tags: list, created_at: int) -> str:        
         data = [0, public_key, created_at, kind, tags, content]
         return json.dumps(data, separators=(',', ':'), ensure_ascii=False)
     
@@ -54,7 +54,7 @@ class Event:
             "id":         self.id,
             "pubkey":     self.public_key,
             "created_at": self.created_at,
-            "kind":       self.kind,
+            "kind":     self.kind,
             "tags":       self.tags,
             "content":    self.content,
             "sig":        self.signature

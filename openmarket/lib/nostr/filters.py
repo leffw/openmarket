@@ -2,9 +2,9 @@ from secrets import token_hex
 
 class Filters:
     
-    def __init__(self, ids: list = [], authors: list = [], kinds: list = [], since: int = None, until: int = None, limit: int = 10) -> None:
+    def __init__(self, ids: list = [], authors: list = [], kind: list = [], since: int = None, until: int = None, limit: int = 10) -> None:
         self.ids = ids
-        self.kinds = kinds
+        self.kind = kind
         self.since = since
         self.until = until
         self.limit = limit
@@ -15,8 +15,8 @@ class Filters:
         if (self.ids):
             event["ids"] = self.ids
         
-        if (self.kinds):
-            event["kinds"] = self.kinds
+        if (self.kind):
+            event["kind"] = self.kind
         
         if (self.authors):
             event["authors"] = self.authors
